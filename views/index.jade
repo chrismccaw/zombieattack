@@ -1,4 +1,6 @@
 extends layout
 block content
-	h3 Facebook User Data
-	p= JSON.stringify(everyauth.facebook.user)
+	h3 Zombie Attack
+	p Hello #{everyauth.facebook.user.first_name}
+
+	input(type='hidden', id='session_hacks', value=session_id)

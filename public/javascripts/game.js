@@ -9,7 +9,7 @@ var game = {
 		right: 'RIGHT'
 	},
 	onload : function(){
-		if(!me.video.init("screen", 640,480,true, 'auto')){
+		if(!me.video.init("screen", 540,380,true)){
 			alert('You browser does not support HTML5 canvas');
 			return;
 		}

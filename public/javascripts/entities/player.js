@@ -34,7 +34,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
 		if(me.input.isKeyPressed('shoot')){
 			if(this.lastTick + 350 < me.timer.getTime()){
 				this.lastTick = me.timer.getTime();
-				var shot = new me.entityPool.newInstanceOf("bullet", this.pos.x + 20, this.pos.y+10, this.direction);
+				var shot = new me.entityPool.newInstanceOf("bullet", this.pos.x + 20, this.pos.y+16, this.direction);
             	me.game.add(shot, this.z);
             	me.game.sort();
         	}

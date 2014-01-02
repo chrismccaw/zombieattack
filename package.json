@@ -12,6 +12,7 @@
     "everyauth": "*",
     "redis":"*",
     "connect-redis" : "*",
-    "session.socket.io": "*"
+    "session.socket.io": "*",
+    "node-uuid" : "*"
   }
 }

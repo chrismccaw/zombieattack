@@ -15,11 +15,13 @@ everyauth.facebook
   .appId(conf.fb.appId)
   .appSecret(conf.fb.appSecret)
   .findOrCreateUser(function(session, accessToken, accessTokExtra, md){
-    return usersByFbId[md.id] || (usersByFbId[md.id] = addUser('facebook', md));
+    /*return usersByFbId[md.id] || (usersByFbId[md.id] = addUser('facebook', md));*/
+    session.md = md;
+    return md;
   })
   .redirectPath('/');
 
 //accessing the user
 everyauth.everymodule.findUserById(function(req, userId, callback) {
-  callback(null, usersById[userId]);
+  callback(null, req.session.md);
 });

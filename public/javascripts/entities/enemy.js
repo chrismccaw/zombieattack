@@ -1,7 +1,7 @@
 game.EnemyEntity = me.ObjectEntity.extend({
 	init: function(x, y){
 		var settings = {
-			 image: 'zombie_right', spritewidth: 32, height:32
+			 image: 'zombie_right', spritewidth: 55, height:55
 		}
 		this.parent(x, y, settings);
 		this.collidable = true;
@@ -9,7 +9,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
 		this.pos.x = x + 100 - settings.spritewidth;
 		this.endX = x + 100 - settings.spritewidth;
 		this.walkLeft = true;
-		this.setVelocity(1, 10);
+		this.setVelocity(Math.random() * 2, 10);
 		this.type = me.game.ENEMY_OBJECT;
 	},
 	onCollision: function(res, obj) {
