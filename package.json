@@ -13,6 +13,7 @@
     "redis":"*",
     "connect-redis" : "*",
     "session.socket.io": "*",
-    "node-uuid" : "*"
+    "node-uuid" : "*",
+    "underscore" : "*"
   }
 }

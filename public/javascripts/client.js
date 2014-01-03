@@ -1,33 +1,66 @@
 game.client = {};
 
+var socket = io.connect('http://localhost:3000');
+
 game.client.init = function () {
 
 
-    var socket = io.connect('http://localhost:3000');
     socket.emit('init', $('#session_hacks').val());
     socket.on('spawnPlayer',function(player){
-    	game.client.addEntity("player", 150, 350);
-/*	    var player = new me.entityPool.newInstanceOf("player", 150 + 100, 350);
-	    me.game.add(player, 20);
-	    me.game.sort();*/
+    	game.client.addEntity("player", {id: player.id,x:150, y:350, name: player.name});
     });
+
     socket.on('spawnEnemy', function(enemy){
-    	console.log('spawn enemy');
-    	game.client.addEntity("enemy",  150 + 50, 350);
-/*    	var enemy = new me.entityPool.newInstanceOf("enemy", 150 + (i * 50), 350);
-        me.game.add(enemy, 10);
-        me.game.sort();*/
+    	game.client.addEntity("enemy", {id:enemy.id, x: enemy.x, y:350});
     });
-/*    for (var i = 0; i < 3; i++) {
-    	 game.client.addEntity("enemy",  150 + (i * 50), 350);
-        var enemy = new me.entityPool.newInstanceOf("enemy", 150 + (i * 50), 350);
-        me.game.add(enemy, 10);
-        me.game.sort();
-    }
-*/
-}
-    game.client.addEntity = function(entityName, x, y){
-	    var entity = new me.entityPool.newInstanceOf(entityName, x, y);
+    
+    socket.on('currentPlayers', function(players){
+        _.each(players, function(player){
+        
+        
+        });
+    });
+
+    socket.on('updatePlayerData', function(playerData){
+        var player = _.find(me.game.world.children, function(child){
+            return child.id == playerData.id;
+        });
+        player.pos.x = playerData.x;
+        player.pos.y = playerData.y;
+    });
+
+    socket.on('createClientBullet', function(bulletData){
+        game.client.addEntity("bullet", bulletData);
+    });
+
+    socket.on('updateZombieMovement', function(z){
+        var where = {
+            id: z.id,
+            type: me.game.ENEMY_OBJECT
+        }
+        var zombie = _.findWhere(me.game.world.children, where);
+        if(zombie){
+            zombie.endX = z.x;
+            zombie.endY = z.y;
+        }
+/*        var enemies = _.each(me.game.world.children, function(child){
+                if(child.type == me.game.ENEMY_OBJECT && _.contains(zombieIds, child.id)){
+                    console.log(child);
+                    enemies.flipX(true);
+                }
+        });*/
+    });
+};
+
+game.client.sendBullet = function(bullet){
+    socket.emit('bulletFired', bullet);
+};
+
+game.client.sendMovement = function(data){
+    socket.emit('playerMovedPosition', data);
+};
+    game.client.addEntity = function(entityName, settings){
+	    var entity = new me.entityPool.newInstanceOf(entityName, settings);
 	    me.game.add(entity, 20);
 	    me.game.sort();
-    }
+    };
