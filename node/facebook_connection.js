@@ -15,7 +15,6 @@ everyauth.facebook
   .appId(conf.fb.appId)
   .appSecret(conf.fb.appSecret)
   .findOrCreateUser(function(session, accessToken, accessTokExtra, md){
-    /*return usersByFbId[md.id] || (usersByFbId[md.id] = addUser('facebook', md));*/
     session.md = md;
     return md;
   })

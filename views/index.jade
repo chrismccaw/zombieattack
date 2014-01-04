@@ -2,5 +2,5 @@ extends layout
 block content
 	h3 Zombie Attack
 	p Hello #{everyauth.facebook.user.first_name}
-
-	input(type='hidden', id='session_hacks', value=session_id)
+	#game
+	input(type='hidden', id='user_id', value=id)

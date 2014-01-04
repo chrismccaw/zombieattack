@@ -13,7 +13,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
         this.startX = x;
         this.pos.x = x + 100 - settings.spritewidth;
         this.walkLeft = true;
-        this.setVelocity(Math.random() * 2, 10);
+        this.setVelocity(Math.random() * 2, 15);
         this.type = me.game.ENEMY_OBJECT;
         this.alwaysUpdate = true;
     },
@@ -21,6 +21,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
         if (obj.type === me.game.BULLET_OBJECT) {
             me.game.remove(this);
             me.game.remove(obj);
+            game.client.enemyKilled(this.id);
         }
     },
     update: function (res, obj) {
@@ -41,6 +42,14 @@ game.EnemyEntity = me.ObjectEntity.extend({
             return true;
         }
         var res = me.game.collide(this);
+        if (res && res.obj.type == me.game.ENEMY_OBJECT) {
+            if (res.obj.vel.x == 0) {
+                console.log("hit");
+                this.pos.x = res.obj.pos.x - 16;
+                //   this.vel.y = -this.maxVel.y * me.timer.tick;
+            }
+
+        }
         return false;
     }
 });
