@@ -10,9 +10,8 @@ game.EnemyEntity = me.ObjectEntity.extend({
         this.id = enemy_data.id;
         this.parent(x, y, settings);
         this.collidable = true;
-        this.startX = x;
-        this.pos.x = x + 100 - settings.spritewidth;
-        this.walkLeft = true;
+        this.pos.x = x;
+        this.walkLeft = false;
         this.setVelocity(Math.random() * 2, 15);
         this.type = me.game.ENEMY_OBJECT;
         this.alwaysUpdate = true;
@@ -26,7 +25,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
     },
     update: function (res, obj) {
         if (this.alive) {
-            if (this.walkLeft && this.pos.x <= this.startX) {
+            if (this.walkLeft && this.pos.x <= this.endX) {
                 this.walkLeft = false;
             } else if (!this.walkLeft && this.pos.x >= this.endX) {
                 this.walkLeft = true;

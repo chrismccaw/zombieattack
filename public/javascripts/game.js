@@ -4,9 +4,7 @@ window.onReady(function onReady(){
 
 var game = {
 	data : {
-		score : 0,
-		left : 'LEFT',
-		right: 'RIGHT'
+		score : 0
 	},
 	onload : function(){
 		if(!me.video.init("game", 540,380,true)){
@@ -14,9 +12,12 @@ var game = {
 			return;
 		}
 		//When loaded callback (this.loaded) is executed
+		me.sys.pauseOnBlur = false;
 		me.loader.onload = this.loaded.bind(this);
 		me.loader.preload(game.resources);
 		me.state.change(me.state.LOADING);
+
+ 
 	},
 	loaded : function(){
 		//sets the states (title and play) and changes to the PLAY state
@@ -25,7 +26,7 @@ var game = {
 		//storage of all entities. Used as object pool for each class. 
 		//That way garbage collection is going to be reduced, since objects are going to be reused
 		me.entityPool.add('player', game.PlayerEntity);
-		me.entityPool.add('coin', game.CoinEntity);
+		me.entityPool.add("dummy_player", game.DummyPlayerEntity);
 		me.entityPool.add("enemy", game.EnemyEntity);
 		me.entityPool.add("bullet", game.BulletEntity);
 		//key binding

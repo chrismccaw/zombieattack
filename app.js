@@ -65,7 +65,7 @@ zombieManager.startSpawning = function () {
 zombieManager.spawnZombie = function () {
     var zombie = {
         id: uuid.v4(),
-        x: 150 + Math.floor(Math.random() * 100)
+        x: 0
     };
     zombies.push(zombie);
     io.sockets.emit('spawnEnemy', zombie);
@@ -83,7 +83,7 @@ zombieManager.zombieAttack = function () {
         }
     });
 };
-
+zombieManager.startSpawning();
 var SessionSockets = require('session.socket.io'),
     sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
 sessionSockets.on('connection', function (err, socket, session) {
@@ -95,8 +95,9 @@ sessionSockets.on('connection', function (err, socket, session) {
                     name: session.md.name
                 }
                 socket.broadcast.emit('spawnPlayer', player);
+                socket.emit('currentPlayers', players);
+            //    socket.emit('currentZombies', zombies);
                 players.push(player);
-                zombieManager.startSpawning();
             };
         });
     });
@@ -112,12 +113,15 @@ sessionSockets.on('connection', function (err, socket, session) {
     });
 
     socket.on('playerMovedPosition', function (playerData) {
+        console.log(playerData);
         var player = _.find(players, function (p) {
             return playerData.id == p.id;
         });
-        player.x = playerData.x;
-        player.y = playerData.y;
-        socket.broadcast.emit('updatePlayerData', player);
+        if(player){
+            player.x = playerData.x;
+            player.y = playerData.y;
+            socket.broadcast.emit('updatePlayerData', player);
+        }
     });
 
 });

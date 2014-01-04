@@ -4,7 +4,7 @@ game.client.init = function () {
     socket = io.connect();
     socket.emit('init');
     socket.on('spawnPlayer', function (player) {
-        game.client.addEntity("player", {
+        game.client.addEntity("dummy_player", {
             id: player.id,
             x: 150,
             y: 350,
@@ -13,11 +13,10 @@ game.client.init = function () {
     });
 
     socket.on('spawnEnemy', function (enemy) {
-        console.log(enemy);
         game.client.addEntity("enemy", {
             id: enemy.id,
             x: enemy.x,
-            y: 350
+            y: 390
         });
     });
 
@@ -25,12 +24,26 @@ game.client.init = function () {
         var player = _.find(me.game.world.children, function (child) {
             return child.id == playerData.id;
         });
-        player.pos.x = playerData.x;
-        player.pos.y = playerData.y;
+        if(player){
+            player.move(playerData.x);
+            player.updateMovement();
+            player.pos.y = playerData.y;
+        }
     });
 
     socket.on('createClientBullet', function (bulletData) {
         game.client.addEntity("bullet", bulletData);
+    });
+
+    socket.on('currentPlayers', function (players) {
+        _.each(players, function(p) {
+             game.client.addEntity("dummy_player", p);
+        });
+    });
+        socket.on('currentZombies', function (zombies) {
+        _.each(zombies, function(z) {
+             game.client.addEntity("enemy", z);
+        });
     });
 
     socket.on('updateZombieMovement', function (z) {
