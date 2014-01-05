@@ -4,7 +4,10 @@ window.onReady(function onReady(){
 
 var game = {
 	data : {
-		score : 0
+		score : 0,
+		health: 100,
+		baseY: 393,
+		playerStartingX: 100
 	},
 	onload : function(){
 		if(!me.video.init("game", 540,380,true)){
@@ -27,7 +30,7 @@ var game = {
 		//That way garbage collection is going to be reduced, since objects are going to be reused
 		me.entityPool.add('player', game.PlayerEntity);
 		me.entityPool.add("dummy_player", game.DummyPlayerEntity);
-		me.entityPool.add("enemy", game.EnemyEntity);
+		me.entityPool.add("zombie", game.EnemyEntity);
 		me.entityPool.add("bullet", game.BulletEntity);
 		//key binding
 		me.input.bindKey(me.input.KEY.Z, 'shoot');
@@ -37,3 +40,7 @@ var game = {
 		me.state.change(me.state.PLAY);
 	}
 }
+
+$( window ).unload(function() {
+  	game.client.disconnect();
+});

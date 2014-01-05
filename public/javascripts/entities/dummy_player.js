@@ -7,13 +7,9 @@ game.DummyPlayerEntity = me.ObjectEntity.extend({
         };
         this.id = player_data.id;
         this.name = player_data.name;
-        console.log(this.name);
-        this.parent(player_data.x, player_data.y, settings);
+        var y = player_data.y;
+        this.parent(player_data.x, y, settings);
         this.setVelocity(3, 15);
-        this.endX = player_data.endX;
-        this.endY = player_data.endY;
-        this.updateColRect(8, 48, -1, 0);
-        this.lastTick = 0;
     },
     move: function(newX){
         if(newX < this.pos.x){
