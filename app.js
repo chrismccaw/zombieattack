@@ -95,7 +95,6 @@ zombieManager.zombieAttack = function () {
                 //  var sock_id = io.sockets.sockets[closest_player.id];
                 //       io.sockets.sockets[sock_id].emit("updatePlayerMetaData", closest_player);
                 io.sockets.emit("updatePlayerMetaData", closest_player);
-                //send score to all clients
             }
             io.sockets.emit('updateZombieMovement', z);
         }
