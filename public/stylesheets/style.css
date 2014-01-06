@@ -3,6 +3,7 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+p.login a:link, p.login a:visited {
+  color: #3B5998;
+  text-decoration:none;  
 }

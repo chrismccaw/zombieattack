@@ -5,8 +5,8 @@
 
 exports.index = function(req, res){
 	if(req.loggedIn) {
-		res.render('index', { id: req.session.md.id});
+		res.render('index');
 	}else{
-		res.render('login', { title: 'Login to Facebook'});
+		res.render('login');
 	}
 };

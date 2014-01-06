@@ -3,7 +3,6 @@
  */
 var express = require('express');
 routes = require('./routes'),
-user = require('./routes/user'),
 path = require('path'),
 everyauth = require('everyauth'),
 RedisStore = require('connect-redis')(express),
@@ -43,7 +42,6 @@ if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
 app.get('/', routes.index);
-//app.get('/users', user.list);
 
 server = server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
@@ -54,7 +52,7 @@ var players = [];
 var zombieManager = {};
 zombieManager.startSpawning = function () {
     setInterval(function () {
-        while (players.length > 0 && zombies.length < 3) {
+        while (players.length > 0 && zombies.length < (10 * players.length)) {
             zombieManager.spawnZombie();
         }
         zombieManager.zombieAttack();
@@ -137,8 +135,6 @@ function detectCollision(bullet) {
             var playerWhoKilledZombie = _.find(players, function (p) {
                 return bullet.playerId == p.id;
             });
-            console.log('playerWhoKilledZombie');
-            console.log(playerWhoKilledZombie);
             playerWhoKilledZombie.score += 10;
             io.sockets.emit('updatePlayerMetaData', playerWhoKilledZombie);
         }
@@ -180,8 +176,6 @@ sessionSockets.on('connection', function (err, socket, session) {
 
     });
     socket.on('bulletFired', function (bullet) {
-        console.log('bullet');
-        console.log(bullet.id);
         socket.broadcast.emit('createClientBullet', bullet);
         detectCollision(bullet);
     });
