@@ -1,18 +1,19 @@
 game.PlayerEntity = me.ObjectEntity.extend({
 	init : function(player_data){
+		console.log(player_data);
 		var settings = {
 			image: "soldier_right",
 			spriteheight: 55,
 			spritewidth: 65
 		};
-		this.id = player_data.id;
-		this.name = player_data.name;
 		this.parent(game.data.playerStartingX, player_data.y, settings);
+		for(k in player_data) this[k] = player_data[k];
 		this.setVelocity(3,15);
 		this.updateColRect(8, 48, -1, 0);
 		me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
 		this.direction = 'r';
 		this.lastTick = 0;
+		this.type = me.game.PLAYER_OBJECT;
 	},
 	update: function(){
 		if(me.input.isKeyPressed('left')){
@@ -36,10 +37,8 @@ game.PlayerEntity = me.ObjectEntity.extend({
 		if(me.input.isKeyPressed('shoot')){
 			if(this.lastTick + 350 < me.timer.getTime()){
 				this.lastTick = me.timer.getTime();
-				var bulletData = {x: this.pos.x + 20, y: this.pos.y+16, direction: this.direction};
-				var shot = new me.entityPool.newInstanceOf("bullet", bulletData);
-            	me.game.add(shot, this.z);
-            	me.game.sort();
+				var bulletData = {x: this.pos.x + 20, y: this.pos.y+16, direction: this.direction, playerId:this.id};
+				game.client.addEntity("bullet", bulletData);
             	game.client.sendBullet(bulletData);
         	}
 		}

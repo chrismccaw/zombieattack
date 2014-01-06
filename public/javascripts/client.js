@@ -2,48 +2,55 @@ game.client = {};
 
 game.client.init = function () {
     socket = io.connect();
-    socket.emit('init');
+    socket.emit('init', "", function(player){
+        var player = game.client.addEntity("player", player);
+        me.game.world.addChild(new game.Healthbar(player));
+        me.game.world.addChild(new game.Score(player));
+        game.userlist.update();
+    });
     socket.on('spawnClientPlayer', function (player) {
         player.x = game.data.playerStartingX;
         game.client.addEntity("dummy_player", player);
+        game.userlist.update();
     });
 
     socket.on('spawnZombie', function (enemy) {
-          game.client.addEntity("zombie",enemy);
+        game.client.addEntity("zombie", enemy);
     });
 
-    socket.on('removeClientPlayer', function(id){
+    socket.on('removeClientPlayer', function (id) {
         var player = game.client.findEntityById(id);
         me.game.remove(player);
     });
 
-    socket.on('updateClientOtherPlayerData', function (playerData) {
+    socket.on('updateClientOtherPlayerMovement', function (playerData) {
         var player = game.client.findEntityById(playerData.id);
         if (player) {
             player.move(playerData.x);
             player.updateMovement();
             player.pos.y = playerData.y;
-            game.data.health = playerData.health;
         }
     });
 
-        socket.on('updatePlayerData', function (playerData) {
+    socket.on('updatePlayerMetaData', function (playerData) {
         var player = game.client.findEntityById(playerData.id);
         if (player) {
-            game.data.health = playerData.health;
-            if(!playerData.isAlive){
+            player.health = playerData.health;
+            player.score = playerData.score;
+            if (!playerData.isAlive) {
                 me.game.remove(player);
             }
         }
+        game.userlist.update();
     });
 
-        socket.on('createClientEntities', function (entites) {
-        _.each(entites.players, function(p){
-            game.client.addEntity('dummy_player',p);
+    socket.on('createClientEntities', function (entites) {
+        _.each(entites.players, function (p) {
+            game.client.addEntity('dummy_player', p);
         });
-        
-        _.each(entites.zombies, function(z){
-            game.client.addEntity('zombie',z);
+
+        _.each(entites.zombies, function (z) {
+            game.client.addEntity('zombie', z);
         });
     });
 
@@ -76,6 +83,18 @@ game.client.init = function () {
             zombie.updateMovement();
         }
     });
+
+    socket.on('killClientZombie', function (zombieId) {
+        var where = {
+            id: zombieId,
+            type: me.game.ENEMY_OBJECT
+        }
+        var zombie = _.findWhere(me.game.world.children, where);
+        if (zombie) {
+            me.game.remove(zombie);
+        }
+    });
+
 };
 
 game.client.sendBullet = function (bullet) {
@@ -91,7 +110,7 @@ game.client.disconnect = function () {
 };
 
 game.client.playerKilled = function (id) {
-     socket.emit('playerKilled', id);
+    socket.emit('playerKilled', id);
 };
 
 game.client.enemyKilled = function (id) {
@@ -99,16 +118,16 @@ game.client.enemyKilled = function (id) {
 };
 
 
-game.client.findEntityById = function(id){
-        var entity = _.find(me.game.world.children, function (child) {
-            return child.id == id;
-        });
-         return entity;
+game.client.findEntityById = function (id) {
+    var entity = _.find(me.game.world.children, function (child) {
+        return child.id == id;
+    });
+    return entity;
 }
 
 game.client.addEntity = function (entityName, settings) {
     var entity = new me.entityPool.newInstanceOf(entityName, settings);
     me.game.add(entity, 20);
     me.game.sort();
+    return entity;
 };
-

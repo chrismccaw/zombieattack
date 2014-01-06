@@ -5,9 +5,10 @@ game.EnemyEntity = me.ObjectEntity.extend({
             spritewidth: 55,
             height: 55
         }
+        for(k in enemy_data) this[k] = enemy_data[k];
+            console.log(this);
         var x = enemy_data.x;
         var y = game.data.baseY;
-        this.id = enemy_data.id;
         this.parent(x, y, settings);
         this.collidable = true;
         this.pos.x = x;
@@ -18,9 +19,9 @@ game.EnemyEntity = me.ObjectEntity.extend({
     },
     onCollision: function (res, obj) {
         if (obj.type === me.game.BULLET_OBJECT) {
-            me.game.remove(this);
+        //    me.game.remove(this);
             me.game.remove(obj);
-            game.client.enemyKilled(this.id);
+       //     game.client.enemyKilled(this.id);
         }
     }
 });

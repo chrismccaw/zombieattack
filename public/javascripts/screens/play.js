@@ -2,10 +2,9 @@
 game.PlayScreen = me.ScreenObject.extend({
 	onResetEvent: function() {	
 	me.levelDirector.loadLevel("area");
-        game.data.health = 100;
-        this.healthbar = new game.Healthbar.Container();
-        me.game.world.addChild(this.healthbar);
-        game.client.addEntity("player", {id: $('#user_id').val(),y:373});
+/*        var player = game.client.addEntity("player", {id: $('#user_id').val(),y:373});
+        me.game.world.addChild(new game.Healthbar(player));
+        me.game.world.addChild(new game.Score(player));*/
         game.client.init();
 
 },

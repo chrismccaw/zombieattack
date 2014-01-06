@@ -10,7 +10,6 @@ game.BulletEntity = me.ObjectEntity.extend({
 		this.endX = x + 500 - settings.spritewidth;
 		this.gravity = 0;
 		this.direction = bulletData.direction;
-		me.game.BULLET_OBJECT = 'BULLET';
 		this.type = me.game.BULLET_OBJECT;
 	},
 	update: function () {

@@ -31,7 +31,7 @@ app.configure(function () {
         store: sessionStore
     }));
     app.use(everyauth.middleware());
-    app.use(express.logger('dev'));
+   // app.use(express.logger('dev'));
     app.use(app.router);
 });
 
@@ -54,7 +54,7 @@ var players = [];
 var zombieManager = {};
 zombieManager.startSpawning = function () {
     setInterval(function () {
-        while (players.length > 0 && zombies.length < 10) {
+        while (players.length > 0 && zombies.length < 3) {
             zombieManager.spawnZombie();
         }
         zombieManager.zombieAttack();
@@ -63,36 +63,39 @@ zombieManager.startSpawning = function () {
 zombieManager.spawnZombie = function () {
     var zombie = {
         id: uuid.v4(),
-        x: 0,
+        x: _.random(0, 90),
         y: 393,
-        spritewidth: 55
+        spritewidth: 55,
+        height: 55
     };
     zombies.push(zombie);
     io.sockets.emit('spawnZombie', zombie);
 };
 
 zombieManager.zombieAttack = function () {
-    console.log("players length " + players);
     _.each(zombies, function (z) {
         var closest_player = _.min(players, function (p) {
             return Math.abs(p.x - z.x);
         });
-        console.log(closest_player);
+        var speed = _.random(5, 15);
         if (closest_player && closest_player.x !== z.x) {
             if (z.x < closest_player.x) {
-                z.x += 10;
+                z.x += speed;
                 z.walkLeft = false;
             } else {
-                z.x += -10;
+                z.x += -speed;
                 z.walkLeft = true;
             }
             if (intersect(closest_player, z)) {
-                closest_player.health -= 5;
-                if(closest_player.health <= 0){
+                closest_player.health -= 1;
+                if (closest_player.health <= 0) {
+                    closest_player.health = 0;
                     closest_player.isAlive = false;
                 }
-                var sock_id = io.sockets.sockets[closest_player.id];
-                io.sockets.sockets[sock_id].emit("updatePlayerData", closest_player);
+                //  var sock_id = io.sockets.sockets[closest_player.id];
+                //       io.sockets.sockets[sock_id].emit("updatePlayerMetaData", closest_player);
+                io.sockets.emit("updatePlayerMetaData", closest_player);
+                //send score to all clients
             }
             io.sockets.emit('updateZombieMovement', z);
         }
@@ -104,8 +107,7 @@ function intersect(player, zombie) {
     var playerx2 = player.x + player.spritewidth;
     var zombiex1 = zombie.x;
     var zombiex2 = zombie.x + zombie.spritewidth;
-    console.log(player.y + " " +  zombie.y);
-    if(player.y <  zombie.y){
+    if (player.y < zombie.y) {
         return false;
     }
 
@@ -116,11 +118,38 @@ function intersect(player, zombie) {
 }
 zombieManager.startSpawning();
 
+function detectCollision(bullet) {
+    var bulletPathLength = 500;
+    var bulletStartX = bullet['x'];
+    var bulletStartY = bullet['y'];
+    var bulletEndX = bullet['direction'] == 'r' ? bulletStartX + bulletPathLength : bulletStartX - bulletPathLength;
+    var zombiesBetweenBullet = _.filter(zombies, function (z) {
+        return Math.min(bulletStartX, bulletEndX) <= z['x'] && Math.max(bulletStartX, bulletEndX) >= z['x'] && (bulletStartY >= (z['y'] - z['height']));
+    });
+    if (zombiesBetweenBullet.length) {
+        var closestZombieToBullet = _.min(zombiesBetweenBullet, function (z) {
+            return Math.abs(bulletStartX - z.x);
+        });
+        if (closestZombieToBullet) {
+            zombies = _.reject(zombies, function (z) {
+                return closestZombieToBullet.id == z.id;
+            });
+            io.sockets.emit('killClientZombie', closestZombieToBullet.id);
+            var playerWhoKilledZombie = _.find(players, function (p) {
+                return bullet.playerId == p.id;
+            });
+            console.log('playerWhoKilledZombie');
+            console.log(playerWhoKilledZombie);
+            playerWhoKilledZombie.score += 10;
+            io.sockets.emit('updatePlayerMetaData', playerWhoKilledZombie);
+        }
+    }
+}
 
 var SessionSockets = require('session.socket.io'),
     sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
 sessionSockets.on('connection', function (err, socket, session) {
-    socket.on('init', function () {
+    socket.on('init', function (name, callback) {
         sessionSockets.getSession(socket, function (err, session) {
             if (session) {
                 var player = {
@@ -128,28 +157,34 @@ sessionSockets.on('connection', function (err, socket, session) {
                     name: session.md.name,
                     health: 100,
                     spritewidth: 65,
-                    isAlive: true
+                    isAlive: true,
+                    type: 'PLAYER',
+                    score: 0,
+                    y: 393
                 }
                 io.sockets.sockets[player.id] = socket.id;
                 var sessionPlayer = _.find(players, function (p) {
                     return p.id == session.md.id;
                 });
                 if (!sessionPlayer) {
-                   socket.broadcast.emit('spawnClientPlayer', player);
-                    /*
-                    send zombie and player data together
-                    */
-                    //socket.emit('currentPlayers', players);
-                    //    socket.emit('currentZombies', zombies);
-                    socket.emit('createClientEntities', {players: players, zombies:zombies});
+                    socket.broadcast.emit('spawnClientPlayer', player);
+                    io.sockets.emit("updatePlayerMetaData", player);
+                    socket.emit('createClientEntities', {
+                        players: players,
+                        zombies: zombies
+                    });
                     players.push(player);
                 }
-
+                callback(player);
             };
         });
+
     });
     socket.on('bulletFired', function (bullet) {
+        console.log('bullet');
+        console.log(bullet.id);
         socket.broadcast.emit('createClientBullet', bullet);
+        detectCollision(bullet);
     });
 
     socket.on('disconnect', function () {
@@ -168,7 +203,7 @@ sessionSockets.on('connection', function (err, socket, session) {
         if (player) {
             player.x = playerData.x;
             player.y = playerData.y;
-            socket.broadcast.emit('updateClientOtherPlayerData', player);
+            socket.broadcast.emit('updateClientOtherPlayerMovement', player);
         }
     });
 

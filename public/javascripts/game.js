@@ -4,13 +4,16 @@ window.onReady(function onReady(){
 
 var game = {
 	data : {
+		width: 540,
+		height: 380,
 		score : 0,
+		display_value_size: 50,
 		health: 100,
 		baseY: 393,
 		playerStartingX: 100
 	},
 	onload : function(){
-		if(!me.video.init("game", 540,380,true)){
+		if(!me.video.init("game", this.data.width, this.data.height,true)){
 			alert('You browser does not support HTML5 canvas');
 			return;
 		}
@@ -19,10 +22,10 @@ var game = {
 		me.loader.onload = this.loaded.bind(this);
 		me.loader.preload(game.resources);
 		me.state.change(me.state.LOADING);
-
- 
 	},
 	loaded : function(){
+		me.game.BULLET_OBJECT = 'BULLET';
+		me.game.PLAYER_OBJECT = 'PLAYER';
 		//sets the states (title and play) and changes to the PLAY state
 		me.state.set(me.state.MENU, new game.TitleScreen());
 		me.state.set(me.state.PLAY, new game.PlayScreen());
