@@ -78,9 +78,7 @@ game.client.init = function () {
         }
         var zombie = _.findWhere(me.game.world.children, where);
         if (zombie) {
-            zombie.pos.x = z.x;
-            zombie.flipX(z.walkLeft);
-            zombie.updateMovement();
+            zombie.move(z.x);
         }
     });
 

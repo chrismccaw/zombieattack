@@ -8,7 +8,7 @@ everyauth = require('everyauth'),
 RedisStore = require('connect-redis')(express),
 redis = require('redis').createClient(),
 sessionStore = new RedisStore(),
-conf = require('./node//conf'),
+conf = require('./node/conf'),
 cookieParser = express.cookieParser('asddsfkjhs38975uy43tttsqldiu23joeey9834y58047yuopgppio5u6'),
 facebook = require('./node/facebook_connection')
 uuid = require('node-uuid'),
@@ -30,7 +30,7 @@ app.configure(function () {
         store: sessionStore
     }));
     app.use(everyauth.middleware());
-   // app.use(express.logger('dev'));
+    app.use(express.logger('dev'));
     app.use(app.router);
 });
 
@@ -52,17 +52,19 @@ var players = [];
 var zombieManager = {};
 zombieManager.startSpawning = function () {
     setInterval(function () {
+        var startPosition = _.random(1) === 1 ? 0 : 2000;
         while (players.length > 0 && zombies.length < (10 * players.length)) {
-            zombieManager.spawnZombie();
+            zombieManager.spawnZombie(startPosition);
         }
         zombieManager.zombieAttack();
     }, 1000);
 }
-zombieManager.spawnZombie = function () {
+zombieManager.spawnZombie = function (startPosition) {
     var zombie = {
         id: uuid.v4(),
-        x: _.random(0, 90),
+        x: startPosition,
         y: 393,
+        velX: 1,
         spritewidth: 55,
         height: 55
     };
@@ -75,16 +77,17 @@ zombieManager.zombieAttack = function () {
         var closest_player = _.min(players, function (p) {
             return Math.abs(p.x - z.x);
         });
-        var speed = _.random(5, 15);
+        var distanceToTravel = _.random(30, 50)
+        var closest_player_pos_x = closest_player.x;
         if (closest_player && closest_player.x !== z.x) {
             if (z.x < closest_player.x) {
-                z.x += speed;
+                z.x += distanceToTravel * z.velX;
                 z.walkLeft = false;
             } else {
-                z.x += -speed;
+                z.x -= distanceToTravel * z.velX;
                 z.walkLeft = true;
             }
-            if (intersect(closest_player, z)) {
+            if (intersects(closest_player, z)) {
                 closest_player.health -= 1;
                 if (closest_player.health <= 0) {
                     closest_player.health = 0;
@@ -99,7 +102,7 @@ zombieManager.zombieAttack = function () {
     });
 };
 
-function intersect(player, zombie) {
+function intersects(player, zombie) {
     var playerx1 = player.x;
     var playerx2 = player.x + player.spritewidth;
     var zombiex1 = zombie.x;
@@ -107,7 +110,6 @@ function intersect(player, zombie) {
     if (player.y < zombie.y) {
         return false;
     }
-
     if ((playerx1 >= zombiex1 && playerx1 <= zombiex2) || (playerx2 >= zombiex1 && playerx2 < zombiex2)) {
         return true;
     }
@@ -149,6 +151,9 @@ sessionSockets.on('connection', function (err, socket, session) {
             if (session) {
                 var player = {
                     id: session.md.id,
+                    x: 200,
+                    velX : 3,
+                    velY: 15,
                     name: session.md.name,
                     health: 100,
                     spritewidth: 65,

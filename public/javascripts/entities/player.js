@@ -1,14 +1,13 @@
 game.PlayerEntity = me.ObjectEntity.extend({
 	init : function(player_data){
-		console.log(player_data);
 		var settings = {
 			image: "soldier_right",
 			spriteheight: 55,
 			spritewidth: 65
 		};
-		this.parent(game.data.playerStartingX, player_data.y, settings);
+		this.parent(player_data.x, player_data.y, settings);
 		for(k in player_data) this[k] = player_data[k];
-		this.setVelocity(3,15);
+		this.setVelocity(player_data.velX, player_data.velY);
 		this.updateColRect(8, 48, -1, 0);
 		me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
 		this.direction = 'r';

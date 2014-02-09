@@ -9,7 +9,7 @@ game.DummyPlayerEntity = me.ObjectEntity.extend({
         this.parent(player_data.x, y, settings);
         for(p in player_data) this[p] = player_data[p];
         this.id = player_data.id;
-        this.setVelocity(3, 15);
+        this.setVelocity(player_data.velX, player_data.velY);
         this.type = me.game.PLAYER_OBJECT;
     },
     move: function(newX){
@@ -23,5 +23,6 @@ game.DummyPlayerEntity = me.ObjectEntity.extend({
             this.flipX(false);
             this.vel.x += this.accel.x * me.timer.tick;
         }
+        updateMovement();
     }
 });

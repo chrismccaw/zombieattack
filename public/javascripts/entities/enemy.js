@@ -6,22 +6,39 @@ game.EnemyEntity = me.ObjectEntity.extend({
             height: 55
         }
         for(k in enemy_data) this[k] = enemy_data[k];
-            console.log(this);
         var x = enemy_data.x;
         var y = game.data.baseY;
         this.parent(x, y, settings);
         this.collidable = true;
         this.pos.x = x;
-        this.walkLeft = false;
-        this.setVelocity(Math.random() * 2, 15);
+        this.setVelocity(enemy_data.velX, 15);
         this.type = me.game.ENEMY_OBJECT;
         this.alwaysUpdate = true;
     },
     onCollision: function (res, obj) {
         if (obj.type === me.game.BULLET_OBJECT) {
-        //    me.game.remove(this);
             me.game.remove(obj);
-       //     game.client.enemyKilled(this.id);
         }
+    },
+    update: function(){
+        if(this.isWalkingToX){
+            var endX = Math.abs(this.moveToX);
+            var currentPosX = Math.abs(this.pos.x);
+            if(endX > currentPosX){
+               this.walkLeft = false; 
+            }else if(endX < currentPosX){
+                this.walkLeft = true; 
+            }
+            if(endX === currentPosX){
+                this.isWalkingToX = false;
+            }
+        this.doWalk(this.walkLeft);
+        this.updateMovement();
+        }
+        return true;   
+    },
+    move: function(newX){
+        this.moveToX = newX;
+        this.isWalkingToX = true;
     }
 });
