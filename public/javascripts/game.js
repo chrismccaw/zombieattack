@@ -4,8 +4,8 @@ window.onReady(function onReady(){
 
 var game = {
 	data : {
-		width: 540,
-		height: 380,
+		width: 1080,
+		height: 760,
 		score : 0,
 		display_value_size: 50,
 		health: 100,
@@ -22,6 +22,7 @@ var game = {
 		me.loader.onload = this.loaded.bind(this);
 		me.loader.preload(game.resources);
 		me.state.change(me.state.LOADING);
+		game.userlist.init();
 	},
 	loaded : function(){
 		me.game.BULLET_OBJECT = 'BULLET';

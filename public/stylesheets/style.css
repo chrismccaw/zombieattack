@@ -7,3 +7,29 @@ p.login a:link, p.login a:visited {
   color: #3B5998;
   text-decoration:none;  
 }
+
+.player {
+	width:200px;
+}
+
+.player .playerName{
+	font-weight: bold;
+	font-size: 11px;
+	display: block;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+.player .playerScore{
+	text-align: center;
+	display: block;
+	font-size: 10px;
+}
+
+.player .playerHealth{
+	padding: 0 10px 10px 10px;
+}
+
+.healthbar{
+	height: 10px;
+}
