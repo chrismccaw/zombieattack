@@ -1,12 +1,34 @@
 game.userlist = game.userlist || {}
 game.userlist.init = function(){
+	this.healthbars = [];
     var team = new Team();
     this.teamView = new TeamView({
           collection: team
     });
 };
 
+game.userlist.storeGameHealthbar = function(healthbarObj){
+	this.healthbars.push(healthbarObj)
+}
+
+game.userlist.calculateHealth = function(percent){
+    	var colorLimit = 210;
+    	var percentExtend = 0 + ((100-percent) * 4);
+    	var halfWay = percentExtend >= colorLimit;
+    	var r = !halfWay ? percentExtend : colorLimit;
+    	var g = halfWay ?  (percent * 4): colorLimit;
+    	var b = 0;
+    	var rgb = 'rgb('+ r +',' + g +',' + b +')';
+    	return rgb;
+};
+
 game.userlist.update = function () {
+	if(this.healthbars){
+		for(var i = 0; i < this.healthbars.length;i++){
+			console.log("PLAYER UPDATE");
+			this.healthbars[i].onPlayerUpdate();
+		}
+	}
     var children = _.where(me.game.world.children, {
         type: me.game.PLAYER_OBJECT
     });
@@ -37,29 +59,23 @@ var PlayerView = Backbone.View.extend({
 		this.createStat('playerHealth', this.renderHealth(this.model.get('health')));
     },
     createStat: function (className, statContent) {
-	    if (!$(this.el).find('span.'+className).length) {
-	        $('<span/>', {
+	    if (!$(this.el).find('div.'+className).length) {
+	        $('<div/>', {
 	            class: className
 	        }).appendTo($(this.el)).html(statContent);
 	    } else {
-	        $(this.el).find('span.'+className).html(statContent);
+	        $(this.el).find('div.'+className).html(statContent);
 	    }
 	},
     unrender: function () {
         $(this.el).remove();
     },
     renderHealth: function(percent){
-    	var colorLimit = 210;
-    	var percentExtend = 0 + ((100-percent) * 4);
-    	var halfWay = percentExtend >= colorLimit;
-    	var r = !halfWay ? percentExtend : colorLimit;
-    	var g = halfWay ?  (percent * 4): colorLimit;
-    	var b = 0;
     	return $('<div/>', {
             class: 'healthbar'
         }).css({
         	'width': percent+"%",
-        	'background-color':'rgb('+ r +',' + g +',' + b +')'
+        	'background-color':game.userlist.calculateHealth(percent)
         });
     }
 });

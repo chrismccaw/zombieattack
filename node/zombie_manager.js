@@ -1,5 +1,9 @@
-module.exports = function (players, zombies, io) {
+module.exports = ZombieManager;
 
+function ZombieManager(commonGameStore) {
+	players = commonGameStore.players;
+	zombies = commonGameStore.zombies;
+	io = commonGameStore.io;
     startSpawning = function () {
         setInterval(function () {
             var startPosition = _.random(1) === 1 ? 0 : 2000;
@@ -10,6 +14,9 @@ module.exports = function (players, zombies, io) {
         }, 1000);
     };
 
+    getZombies = function(){
+    	return zombies;
+    };
     spawnZombie = function (startPosition) {
         var zombie = {
             id: uuid.v4(),
@@ -94,7 +101,8 @@ module.exports = function (players, zombies, io) {
     };
 
     return {
-    	startSpawning : startSpawning,
-    	detectCollision : detectCollision
+        startSpawning: startSpawning,
+        detectCollision: detectCollision,
+        getZombies : getZombies
     };
 }

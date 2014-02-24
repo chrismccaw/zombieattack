@@ -47,18 +47,42 @@ server = server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
 
-var zombies = [];
-var players = [];
-var Zombie = require("./node/zombie");
-var zombie = new Zombie(players, zombies, io);
-zombie.startSpawning();
 
+var Game = function(){
+    var init = function(){
+        var zombies = new Array();
+        var players = new Array();
+        this.commonGameStore = {
+            players : players,
+            zombies : zombies,
+            io : io
+        }
+    };
+    var createZombieManager = function(){
+        var ZombieManager = require("./node/zombie_manager");
+        return new ZombieManager(commonGameStore);
+    };
+    var startSocketClient = function(zombieManager){
+        var SessionSockets = require('session.socket.io');
+        var sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
+        var SocketClient = require('./node/socket_client');
+        var socketClient = new SocketClient(commonGameStore, zombieManager, sessionSockets);
+        socketClient.connect();
+    };
+    var start = function(){
+        init();
+        var zombieManager = createZombieManager();
+        startSocketClient(zombieManager);
+        zombieManager.startSpawning();
+    }
+    return {
+        start : start
+    }
+}
 
-var SessionSockets = require('session.socket.io'),
-    sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
-var SocketClient = require('./node/socket_client');
-var socket_client = new SocketClient(players, zombies, zombie, sessionSockets, io);
-socket_client.connectSocketSession();
+var game = new Game();
+game.start();
+
 /*process.on('uncaughtException', function(err) {
   console.log(err);
 });*/

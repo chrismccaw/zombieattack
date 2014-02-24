@@ -4,9 +4,12 @@ game.client.init = function () {
     socket = io.connect();
     socket.emit('init', "", function(player){
         var player = game.client.addEntity("player", player);
-        me.game.world.addChild(new game.Healthbar(player));
+       game.userlist.update();
+       var callback = function(healthObj){
+            game.userlist.storeGameHealthbar(healthObj)
+       }
+        me.game.world.addChild(new game.Healthbar(player, callback));
         me.game.world.addChild(new game.Score(player));
-        game.userlist.update();
     });
     socket.on('spawnClientPlayer', function (player) {
         player.x = game.data.playerStartingX;

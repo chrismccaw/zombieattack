@@ -17,6 +17,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
     },
     onCollision: function (res, obj) {
         if (obj.type === me.game.BULLET_OBJECT) {
+            console.log("Remove collision");
             me.game.remove(obj);
         }
     },

@@ -1,29 +1,36 @@
-module.exports = function (players, zombies, zombie, sessionSockets, io) {
+module.exports = SocketClient;
 
-    var connectSocketSession = function () {
+function SocketClient(commonGameStore, zombieManager, sessionSockets) {
 
+    players = commonGameStore.players;
+    zombies = commonGameStore.zombies;
+    io = commonGameStore.io;
+    var connect = function () {
         sessionSockets.on('connection', function (err, socket, session) {
             socket.on('init', function (name, callback) {
                 sessionSockets.getSession(socket, function (err, session) {
+
                     if (session) {
-                        var player = {
-                            id: session.md.id,
-                            x: 200,
-                            velX: 3,
-                            velY: 15,
-                            name: session.md.name,
-                            health: 100,
-                            spritewidth: 65,
-                            isAlive: true,
-                            type: 'PLAYER',
-                            score: 0,
-                            y: 393
-                        }
-                        io.sockets.sockets[player.id] = socket.id;
+                        // io.sockets.sockets[player.id] = socket.id;
                         var sessionPlayer = _.find(players, function (p) {
                             return p.id == session.md.id;
                         });
-                        if (!sessionPlayer) {
+                        if (sessionPlayer) {
+                            players.push(sessionPlayer);
+                        } else {
+                            var player = {
+                                id: session.md.id,
+                                x: 200,
+                                velX: 3,
+                                velY: 15,
+                                name: session.md.name,
+                                health: 100,
+                                spritewidth: 65,
+                                isAlive: true,
+                                type: 'PLAYER',
+                                score: 0,
+                                y: 393
+                            }
                             socket.broadcast.emit('spawnClientPlayer', player);
                             io.sockets.emit("updatePlayerMetaData", player);
                             socket.emit('createClientEntities', {
@@ -31,15 +38,16 @@ module.exports = function (players, zombies, zombie, sessionSockets, io) {
                                 zombies: zombies
                             });
                             players.push(player);
+
                         }
+
                         callback(player);
                     };
                 });
-
             });
             socket.on('bulletFired', function (bullet) {
                 socket.broadcast.emit('createClientBullet', bullet);
-                zombie.detectCollision(bullet);
+                zombieManager.detectCollision(bullet);
             });
 
             socket.on('disconnect', function () {
@@ -75,9 +83,10 @@ module.exports = function (players, zombies, zombie, sessionSockets, io) {
                 socket.broadcast.emit('removeClientPlayer', id);
             });
         });
+    }
 
-    }
     return {
-        connectSocketSession: connectSocketSession
+        connect: connect
     }
+
 }
