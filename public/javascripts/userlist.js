@@ -25,7 +25,6 @@ game.userlist.calculateHealth = function(percent){
 game.userlist.update = function () {
 	if(this.healthbars){
 		for(var i = 0; i < this.healthbars.length;i++){
-			console.log("PLAYER UPDATE");
 			this.healthbars[i].onPlayerUpdate();
 		}
 	}
@@ -44,27 +43,26 @@ var PlayerView = Backbone.View.extend({
     className: 'player',
     initialize: function () {
         _.bindAll(this, 'render', 'unrender', 'renderHealth', 'createStat');
-        var that = this;
-        this.model.on('change', function(){
-        	that.render();
-         });
     },
     render: function () {
-    	this.$el.html(this.createPlayerStats());
+    	this.createPlayerStats();
         return this;
     },
     createPlayerStats: function(){
-        this.createStat('playerScore', this.model.get('score'));
-		this.createStat('playerName', this.model.get('name'));
-		this.createStat('playerHealth', this.renderHealth(this.model.get('health')));
+        this.createStat('playerNameHealthContainer', "", this.el);
+        var playerContainerEl = $(this.el).find('.playerNameHealthContainer');
+        this.createStat('playerName', this.model.get('name'), playerContainerEl);
+        this.createStat('playerHealth', this.renderHealth(this.model.get('health')), playerContainerEl);
+
+        this.createStat('playerScore', this.model.get('score'), this.el);
     },
-    createStat: function (className, statContent) {
-	    if (!$(this.el).find('div.'+className).length) {
+    createStat: function (className, statContent, appendToEl) {
+	    if (!$(appendToEl).find('div.'+className).length) {
 	        $('<div/>', {
 	            class: className
-	        }).appendTo($(this.el)).html(statContent);
+	        }).appendTo($(appendToEl)).html(statContent);
 	    } else {
-	        $(this.el).find('div.'+className).html(statContent);
+	        $(appendToEl).find('div.'+className).html(statContent);
 	    }
 	},
     unrender: function () {
@@ -117,7 +115,7 @@ var TeamView = Backbone.View.extend({
             model: player
         });
         var playerHtml = playerView.render().el;
-        $(this.el).html(playerHtml);
+        $(this.el).append(playerHtml);
         this._subviews.push(playerView);
     }
 });

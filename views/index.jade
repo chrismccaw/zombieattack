@@ -1,8 +1,13 @@
 extends layout
 block content
-	h3 Zombie Attack
-	p Hello #{everyauth.facebook.user.first_name}
-	#game
-	input(type='hidden', id='user_id', value=id)
-	h4 Survivors
-	#users
+	.container.zombie-game
+		.zombie-header
+			h3 Zombie Attack	
+			p.lead
+				h5 Defend from zombies
+		p Hello #{everyauth.facebook.user.first_name}
+		.row
+			.col-xs-6#game
+			.col-xs-6.team
+				h4 Survivors
+				#users

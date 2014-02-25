@@ -1,22 +1,14 @@
-window.onReady(function onReady(){
-	game.onload();
-});
-
 var game = {
-	data : {
-		width: 1080,
-		height: 760,
-		score : 0,
-		display_value_size: 50,
-		health: 100,
-		baseY: 393,
-		playerStartingX: 100
-	},
 	onload : function(){
-		if(!me.video.init("game", this.data.width, this.data.height,true)){
+		me.device.getPixelRatio = function(){
+			return 0;
+		}
+		if(!me.video.init("game", this.data.width, this.data.height,false,1,false)){
 			alert('You browser does not support HTML5 canvas');
 			return;
 		}
+
+
 		//When loaded callback (this.loaded) is executed
 		me.sys.pauseOnBlur = false;
 		me.loader.onload = this.loaded.bind(this);
@@ -44,6 +36,19 @@ var game = {
 		me.state.change(me.state.PLAY);
 	}
 }
+
+window.onReady(function onReady(){
+	game.data = {
+		width: $("#game").width(),
+		height: 400,
+		score : 0,
+		display_value_size: 50,
+		health: 100,
+		baseY: 393,
+		playerStartingX: 100
+	}
+	game.onload();
+});
 
 $( window ).unload(function() {
   	game.client.disconnect();

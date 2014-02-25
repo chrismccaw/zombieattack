@@ -22,7 +22,7 @@ game.Healthbar = me.ObjectContainer.extend({
 
  game.Healthbar.display = me.Renderable.extend({
  	init: function(player, callback){
- 		this.parent(new me.Vector2d(20,20),400,30);
+ 		this.parent(new me.Vector2d(10,10),300,15);
  		this.player = player;
  		this.floating = true;
  		callback(this);
@@ -38,11 +38,11 @@ game.Healthbar = me.ObjectContainer.extend({
  		return false;
  	},
  	draw: function(context){
- 		context.fillStyle = 'black';
- 		context.fillRect(this.left, this.top, this.width, this.height);
+
  		var percent = this.player.health;
 
  		context.fillStyle =  game.userlist.calculateHealth(percent);
+ 		context.clearRect(this.left, this.top, this.width, this.height);
 		context.fillRect(this.left, this.top, (this.width/100)*percent, this.height);
  	}
  });

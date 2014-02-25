@@ -9,27 +9,42 @@ p.login a:link, p.login a:visited {
 }
 
 .player {
-	width:200px;
+	width:400px;
+	height: auto;
+	overflow: hidden;
+	margin-bottom:10px;
 }
 
 .player .playerName{
 	font-weight: bold;
-	font-size: 11px;
-	display: block;
-	margin-bottom: 10px;
-	text-align: center;
+	font-size: 14px;
+	text-align: left;
 }
 
 .player .playerScore{
-	text-align: center;
-	display: block;
-	font-size: 10px;
+	font-size: 14px;
+	margin-left:10px;
+	float:left;
 }
 
 .player .playerHealth{
-	padding: 0 10px 10px 10px;
+	padding: 0 0px 0px 0px;
 }
 
+.playerNameHealthContainer{
+	width:200px;
+	float:left;
+}
 .healthbar{
-	height: 10px;
+	height: 15px;
+}
+
+
+.zombie-header{
+	padding:20px 20px 20px 0;
+}
+
+.team h4{
+	margin-top: 0px;
+	padding-top: 0px;
 }
