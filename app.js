@@ -48,40 +48,13 @@ server = server.listen(app.get('port'), function () {
 });
 
 
-var Game = function(){
-    var init = function(){
-        var zombies = new Array();
-        var players = new Array();
-        this.commonGameStore = {
-            players : players,
-            zombies : zombies,
-            io : io
-        }
-    };
-    var createZombieManager = function(){
-        var ZombieManager = require("./node/zombie_manager");
-        return new ZombieManager(commonGameStore);
-    };
-    var startSocketClient = function(zombieManager){
-        var SessionSockets = require('session.socket.io');
-        var sessionSockets = new SessionSockets(io, sessionStore, cookieParser);
-        var SocketClient = require('./node/socket_client');
-        var socketClient = new SocketClient(commonGameStore, zombieManager, sessionSockets);
-        socketClient.connect();
-    };
-    var start = function(){
-        init();
-        var zombieManager = createZombieManager();
-        startSocketClient(zombieManager);
-        zombieManager.startSpawning();
-    }
-    return {
-        start : start
-    }
-}
 
-var game = new Game();
-game.start();
+//lookup room
+//wait to begin
+//start game
+var GameRoom = require('./node/room');
+var room = new GameRoom(1, {io: io, sessionStore: sessionStore, cookieParser: cookieParser});
+room.beginGame();
 
 /*process.on('uncaughtException', function(err) {
   console.log(err);
